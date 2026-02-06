@@ -1,0 +1,32 @@
+services:
+  # Backend service
+  - type: web
+    name: visualizer-backend
+    env: python
+    buildCommand: |
+      cd backend
+      pip install -r requirements.txt
+      python manage.py migrate
+    startCommand: |
+      cd backend
+      gunicorn core.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: DJANGO_SETTINGS_MODULE
+        value: core.settings
+      - key: SECRET_KEY
+        value: django-insecure-nnzb17id$&)4)n#(k1=t--$9!k8()wyin4iz0f%c45zwn)8l(k
+
+  # Frontend service
+  - type: web
+    name: visualizer-frontend
+    env: static
+    buildCommand: |
+      cd frontend
+      npm install
+      npm run build
+    staticPublishPath: frontend/build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://visualizer-backend.onrender.com/api
